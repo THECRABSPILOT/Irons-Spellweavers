@@ -1,6 +1,6 @@
-package io.redspace.irons_example_mod.spells;
+package crab.mods.irons_spellweavers.spells;
 
-import io.redspace.irons_example_mod.IronsExampleMod;
+import crab.mods.irons_spellweavers.IronsSpellweavers;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -19,12 +19,12 @@ import java.util.Optional;
 
 @AutoSpellConfig
 public class SuperHealSpell extends AbstractSpell {
-    private final ResourceLocation spellId = new ResourceLocation(IronsExampleMod.MODID, "super_heal");
+    private final ResourceLocation spellId = new ResourceLocation(IronsSpellweavers.MODID, "super_heal");
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.irons_example_mod.healing", Utils.stringTruncation(getSpellPower(spellLevel, caster), 1))
+                Component.translatable("ui.irons_spellweavers.healing", Utils.stringTruncation(getSpellPower(spellLevel, caster), 1))
         );
     }
 
@@ -69,9 +69,9 @@ public class SuperHealSpell extends AbstractSpell {
     }
 
     @Override
-    public void onCast(Level world, int spellLevel, LivingEntity entity, MagicData playerMagicData) {
+    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         entity.heal(getSpellPower(spellLevel, entity));
-        super.onCast(world, spellLevel, entity, playerMagicData);
+        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
     @Override

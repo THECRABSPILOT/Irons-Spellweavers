@@ -29,6 +29,9 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES' //SCAN, REGISTRYDUMP
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'fml.earlyWindowControl', 'false'
             mods { "${mod_id}" { source sourceSets.main } }
         }
 
@@ -37,6 +40,8 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods { "${mod_id}" { source sourceSets.main } }
         }
 
@@ -62,14 +67,15 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenCentral()
     maven {
         name = "Iron's Maven - Release"
         url = "https://code.redspace.io/releases"
     }
 
     maven {
-        name = "Iron's Maven - Snapshots"
-        url = "https://code.redspace.io/snapshots"
+        name = "Iron's Maven - Releases"
+        url = "https://code.redspace.io/releases"
     }
 
     maven { url = "https://maven.enginehub.org/repo/" }
@@ -78,6 +84,7 @@ repositories {
     maven { url = "https://cursemaven.com" }
     maven { url = "https://maven.blamejared.com" }
     maven { url = "https://maven.kosmx.dev/" }
+    maven { url = "https://modmaven.dev/" }
 }
 
 //This is helpful if you are using ISS SNAPSHOT releases.  You can comment it out if you are using an actual version
@@ -86,56 +93,55 @@ configurations.all {
 }
 
 dependencies {
-    // FORGE ******************************************************************************************************
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // Minecraft & Forge
+    minecraft "net.minecraftforge:forge:1.20.1-47.4.18"
 
-    // MIXINS *****************************************************************************************************
-    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    // IRONS SPELLS N SPELLBOOKS **********************************************************************************
-    compileOnly fg.deobf("io.redspace.ironsspellbooks:irons_spellbooks:${irons_spells_version}:api")
-    runtimeOnly fg.deobf("io.redspace.ironsspellbooks:irons_spellbooks:${irons_spells_version}")
+    // Iron's
+    runtimeOnly  fg.deobf("io.redspace:irons_lib:1.20.1-2.1.0")
+    compileOnly  fg.deobf("io.redspace:irons_spellbooks:1.20.1-3.16.2:api")
+    runtimeOnly  fg.deobf("io.redspace:irons_spellbooks:1.20.1-3.16.2")
 
-    // GECKOLIB ***************************************************************************************************
-    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${geckolib_version}")
+    // Curios
+    compileOnly  fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
+    runtimeOnly  fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
 
-    // CAELUS *****************************************************************************************************
-    compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}:api")
-    runtimeOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
+    // GeckoLib  ← this was missing fg.deobf
+    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.8.4")
 
-    // PLAYER ANIMATOR ********************************************************************************************
-    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}")
+    // Player Animator (also has mixins)
+    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:1.0.2-rc1+1.20")
+
+
+    // Caelus API (CurseMaven)
+    implementation fg.deobf("curse.maven:caelus-308989:5281700")
+
+    //Node graph
+    implementation fg.deobf("io.github.tt432:nodegraph:1.1.2")
 
     // TETRA ******************************************************************************************************
-    compileOnly fg.deobf("se.mickelus.mutil:mutil:${mutil_version}")
-    compileOnly fg.deobf("curse.maven:tetra-${tetra_version}")
+    //compileOnly fg.deobf("se.mickelus.mutil:mutil:${mutil_version}")
+    //compileOnly fg.deobf("curse.maven:tetra-${tetra_version}")
     // If you want to run with tetra in dev comment the above line and uncomment the following 2 lines
     //runtimeOnly fg.deobf("curse.maven:tetra-${tetra_version}")
     //implementation fg.deobf("se.mickelus.mutil:mutil:${mutil_version}")
 
-    // JEI ********************************************************************************************************
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_mc_version}-forge:${jei_version}")
 
-    // CURIOS *****************************************************************************************************
-    implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
-    //Uncomment the following line to run with Curios in dev
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+
 
     // BETTER COMBAT **********************************************************************************************
     //runtimeOnly fg.deobf("curse.maven:better-combat-by-daedelus-${better_combat_version}")
     //runtimeOnly fg.deobf("curse.maven:cloth-config-348521:4633416")
 
     // PATCHOULI **************************************************************************************************
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+    //compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
 
     // APOTHEOSIS
-    compileOnly fg.deobf("curse.maven:apotheosis-${apotheosis_version}")
-    runtimeOnly fg.deobf("curse.maven:apotheosis-${apotheosis_version}")
-    runtimeOnly fg.deobf("curse.maven:placebo-${placebo_version}")
-    runtimeOnly fg.deobf("curse.maven:attributeslib-${attributeslib_version}")
+    //compileOnly fg.deobf("curse.maven:apotheosis-${apotheosis_version}")
+    //runtimeOnly fg.deobf("curse.maven:apotheosis-${apotheosis_version}")
+    //runtimeOnly fg.deobf("curse.maven:placebo-${placebo_version}")
+    //runtimeOnly fg.deobf("curse.maven:attributeslib-${attributeslib_version}")
 
     // JSON ******************************************************************************************************
     implementation "com.google.code.gson:gson:${gson_version}"
